@@ -66,6 +66,7 @@
     stringifyData: false,
     password: null,
     username: null,
+    stripTrailingSlash: false,
     verbs: {
       'create': 'POST',
       'read': 'GET',
@@ -222,7 +223,7 @@
       this.root = this.parent.root;
       this.numParents = this.parent.numParents + 1;
       this.urlNoId = this.parent.url + ("" + (this.opts.url || this.name) + "/");
-      this.url = this.urlNoId + (":ID_" + this.numParents + "/");
+      this.url = this.urlNoId + (":ID_" + this.numParents + "/" );
       $.each(this.opts.verbs, $.proxy(this.addVerb, this));
       if (this["delete"]) {
         return this.del = this["delete"];
@@ -305,7 +306,7 @@
       }
       for (i = _j = 0, _len1 = ids.length; _j < _len1; i = ++_j) {
         id = ids[i];
-        url = url.replace(new RegExp("\/:ID_" + (i + 1) + "\/"), "/" + id + "/");
+        url = url.replace(new RegExp("\/:ID_" + (i + 1) + "(\/|$)"), "/" + id + "$1");
       }
       return {
         url: url,
@@ -332,6 +333,11 @@
       if (data && this.opts.stringifyData) {
         data = stringify(data);
       }
+
+      if ( this.opts.stripTrailingSlash ) {
+        url = url.replace( new RegExp( "/$" ), '' );
+      }
+
       ajaxOpts = {
         url: url,
         type: method,
